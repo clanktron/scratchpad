@@ -5,7 +5,11 @@ target "default" {
   ]
 }
 
-target "all" {
+group "all" {
+  targets = ["linux", "darwin"]
+}
+
+target "linux" {
   target = "output"
   platforms = [
     "linux/arm64",
@@ -13,6 +17,20 @@ target "all" {
     "linux/arm/v7",
     "linux/riscv64"
   ]
+  output = [
+    "type=local,dest=./dist,platform-split=false",
+  ]
+}
+
+target "darwin" {
+  matrix = {
+    arch = ["arm64", "amd64"]
+  }
+  name = "darwin-${arch}"
+  target = "darwin-output"
+  args = {
+    DARWIN_ARCH = "${arch}"
+  }
   output = [
     "type=local,dest=./dist,platform-split=false",
   ]

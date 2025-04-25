@@ -1,19 +1,21 @@
+ARTIFACT_DIR=dist
 BINARY_NAME=scratchpad
-ORG=clanktron
 VERSION=1.0.0
 GOENV=CGO_ENABLED=0
+GOOS=
+GOARCH=
 BUILD_FLAGS=-ldflags="-X 'main.Version=$(VERSION)'"
-# TEST_FLAGS=-cover -count 1
-ARTIFACT_DIR=dist
+TEST_FLAGS=-cover -count 1
 
 CLI=docker
+ORG=clanktron
 CONTAINERNAME=$(ORG)/$(BINARY_NAME)
 CONTAINERTAG=dev
 
 PLATFORMS=linux/arm64,linux/amd64,linux/arm/v7,linux/riscv64
 
 $(BINARY_NAME):
-	$(GOENV) go build $(BUILD_FLAGS) -o $(BINARY_NAME) $(SRC) ## Build binary (default)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOENV) go build $(BUILD_FLAGS) -o $(BINARY_NAME) $(SRC) ## Build binary (default)
 
 .PHONY: check
 check: test lint ## Test and lint
@@ -27,29 +29,6 @@ lint: ## Run go vet and staticcheck against codebase
 	go vet ./...
 	staticcheck ./...
 
-.PHONY: build-container
-build-container: clean ## Build the container
-	$(CLI) buildx build -t $(CONTAINERNAME):$(CONTAINERTAG) . -o dist -o type=docker
-
-.PHONY: build-container-multiarch
-build-container-multiarch: clean ## Build the container
-	$(CLI) buildx build -t $(CONTAINERNAME):$(CONTAINERTAG) . --platform $(PLATFORMS)
-
-.PHONY: build-container-multiarch-output
-build-container-multiarch-output: clean ## Build the container
-	$(CLI) buildx build -t $(CONTAINERNAME):$(CONTAINERTAG) . --platform $(PLATFORMS) -o dist
-	
-.PHONY: push-container
-push-container: ## Push the container
-	$(CLI) push $(CONTAINERNAME):$(CONTAINERTAG)
-
-.PHONY: container-push
-build-and-push-container: build-container push-container ## Build and push the container
-
-.PHONY: dependencies
-dependencies: ## Run go mod and go get to ensure dependencies
-	go mod tidy && go get -v -d ./...
-
 .PHONY: release-chart
 package-chart: ## Package helm chart
 	helm package -u ./chart -d $(ARTIFACT_DIR)
@@ -61,6 +40,7 @@ checksums: ## Generate release asset checksums
 .PHONY: clean
 clean: ## Clean workspace
 	rm -rf $(BINARY_NAME) $(ARTIFACT_DIR)/*
+	go clean
 
 .PHONY: help
 help:
