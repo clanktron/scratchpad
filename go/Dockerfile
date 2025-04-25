@@ -9,7 +9,7 @@ COPY . /build
 ARG DARWIN_ARCH
 RUN make GOOS=darwin GOARCH=${DARWIN_ARCH}
 
-FROM scratch AS darwin-output
+FROM scratch AS darwin-bin
 ARG DARWIN_ARCH
 COPY --from=darwin-builder /build/scratchpad /scratchpad-darwin-${DARWIN_ARCH}
 
@@ -17,11 +17,11 @@ FROM builder-base AS builder
 COPY . /build
 RUN make
 
-FROM scratch AS output
+FROM scratch AS bin
 ARG TARGETARCH
 COPY --from=builder /build/scratchpad /scratchpad-linux-${TARGETARCH}
 
-FROM scratch
+FROM scratch AS production
 COPY <<EOF /etc/passwd
 "scratchpad:x:1001:1001::/:"
 EOF

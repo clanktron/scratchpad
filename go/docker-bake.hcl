@@ -6,11 +6,24 @@ target "default" {
 }
 
 group "all" {
-  targets = ["linux", "darwin"]
+  targets = ["containers", "linux", "darwin"]
+}
+
+target "containers" {
+  target = "production"
+  platforms = [
+    "linux/arm64",
+    "linux/amd64",
+    "linux/arm/v7",
+    "linux/riscv64"
+  ]
+  output = [
+    "type=registry,name=clanktron/scratchpad:dev",
+  ]
 }
 
 target "linux" {
-  target = "output"
+  target = "bin"
   platforms = [
     "linux/arm64",
     "linux/amd64",
@@ -23,11 +36,11 @@ target "linux" {
 }
 
 target "darwin" {
+  target = "darwin-bin"
   matrix = {
     arch = ["arm64", "amd64"]
   }
   name = "darwin-${arch}"
-  target = "darwin-output"
   args = {
     DARWIN_ARCH = "${arch}"
   }
