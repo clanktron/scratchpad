@@ -2,14 +2,9 @@ FROM golang:1.24-alpine AS builder-base
 RUN apk add --no-cache ca-certificates make git
 WORKDIR /build
 COPY go.mod /build/
-
-FROM builder-base AS builder
 RUN go mod download
-COPY . /build
-RUN make
 
 FROM builder-base AS darwin-builder
-RUN go mod download
 COPY . /build
 ARG DARWIN_ARCH
 RUN make GOOS=darwin GOARCH=${DARWIN_ARCH}
@@ -17,6 +12,10 @@ RUN make GOOS=darwin GOARCH=${DARWIN_ARCH}
 FROM scratch AS darwin-output
 ARG DARWIN_ARCH
 COPY --from=darwin-builder /build/scratchpad /scratchpad-darwin-${DARWIN_ARCH}
+
+FROM builder-base AS builder
+COPY . /build
+RUN make
 
 FROM scratch AS output
 ARG TARGETARCH
