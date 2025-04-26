@@ -1,7 +1,22 @@
-target "default" {
-  output = [
-    "type=docker,name=clanktron/scratchpad:dev"
+variable "cache_settings" {
+  default = [
+    {
+      type = "registry",
+      ref = "clanktron/scratchpad-cache:cache"
+    }
   ]
+}
+
+target "default" {
+  inherits = ["cache"]
+  output = [
+    "type=image,name=clanktron/scratchpad:dev"
+  ]
+}
+
+target "cache" {
+  cache-from = cache_settings
+  cache-to = cache_settings
 }
 
 group "all" {
@@ -13,6 +28,7 @@ group "release-binaries" {
 }
 
 target "containers" {
+  inherits = ["cache"]
   target = "production"
   platforms = [
     "linux/arm64",
@@ -25,8 +41,15 @@ target "containers" {
   ]
 }
 
-target "linux" {
+target "bin" {
   target = "bin"
+  output = [
+    "type=local,dest=./dist,platform-split=false",
+  ]
+}
+
+target "linux" {
+  inherits = ["cache","bin"]
   matrix = {
     arch = ["arm64", "amd64", "arm", "riscv64"]
   }
@@ -35,13 +58,10 @@ target "linux" {
     BINOS = "linux",
     BINARCH = "${arch}"
   }
-  output = [
-    "type=local,dest=./dist,platform-split=false",
-  ]
 }
 
 target "darwin" {
-  target = "bin"
+  inherits = ["cache","bin"]
   matrix = {
     arch = ["arm64", "amd64"]
   }
@@ -50,13 +70,10 @@ target "darwin" {
     BINOS = "darwin",
     BINARCH = "${arch}"
   }
-  output = [
-    "type=local,dest=./dist,platform-split=false",
-  ]
 }
 
 target "windows" {
-  target = "bin"
+  inherits = ["cache","bin"]
   matrix = {
     arch = ["arm64", "amd64"]
   }
@@ -65,7 +82,4 @@ target "windows" {
     BINOS = "windows",
     BINARCH = "${arch}"
   }
-  output = [
-    "type=local,dest=./dist,platform-split=false",
-  ]
 }
