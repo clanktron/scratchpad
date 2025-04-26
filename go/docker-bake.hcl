@@ -14,6 +14,13 @@ target "default" {
   ]
 }
 
+target "default-push" {
+  inherits = ["default"]
+  output = [
+    "type=registry,name=clanktron/scratchpad:dev"
+  ]
+}
+
 target "cache" {
   cache-from = cache_settings
   cache-to = cache_settings

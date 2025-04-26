@@ -1,9 +1,9 @@
-name: release-build
+name: dev-build
 
 on:
   push:
-    tags:
-    - "*"
+    branches:
+      - "main"
 jobs:
   build:
     name: Build and deploy
@@ -36,12 +36,4 @@ jobs:
       - name: Build Release Assets
         run: |
           cd go
-          docker buildx bake all
-
-      - name: Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "$GITHUB_REF_NAME" ./go/dist/* \
-            --title "$GITHUB_REF_NAME" \
-            --notes "Automated release from GitHub Actions"
+          docker buildx bake default-push
