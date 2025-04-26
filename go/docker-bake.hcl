@@ -19,6 +19,13 @@ target "cache" {
   cache-to = cache_settings
 }
 
+target "bin" {
+  target = "bin"
+  output = [
+    "type=local,dest=./dist,platform-split=false",
+  ]
+}
+
 group "all" {
   targets = ["containers", "linux", "darwin", "windows"]
 }
@@ -38,13 +45,6 @@ target "containers" {
   ]
   output = [
     "type=registry,name=clanktron/scratchpad:dev",
-  ]
-}
-
-target "bin" {
-  target = "bin"
-  output = [
-    "type=local,dest=./dist,platform-split=false",
   ]
 }
 
