@@ -7,17 +7,22 @@ variable "cache_settings" {
   ]
 }
 
+variable "org" { default = "clanktron" }
+variable "repo" { default = "scratchpad" }
+variable "tag" { default = "dev" }
+variable "ref" { default = "${org}/${repo}:${tag}"}
+
 target "default" {
   inherits = ["cache"]
   output = [
-    "type=image,name=clanktron/scratchpad:dev"
+    "type=image,name=${ref}"
   ]
 }
 
 target "default-push" {
   inherits = ["default"]
   output = [
-    "type=registry,name=clanktron/scratchpad:dev"
+    "type=registry,name=${ref}"
   ]
 }
 
@@ -51,7 +56,7 @@ target "containers" {
     "linux/riscv64"
   ]
   output = [
-    "type=registry,name=clanktron/scratchpad:dev",
+    "type=registry,name=${ref}",
   ]
 }
 
