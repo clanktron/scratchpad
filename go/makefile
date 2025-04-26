@@ -1,5 +1,5 @@
 ARTIFACT_DIR=dist
-BINARY_NAME=scratchpad
+BINARY=scratchpad
 VERSION=1.0.0
 GOENV=CGO_ENABLED=0
 GOOS=
@@ -9,13 +9,11 @@ TEST_FLAGS=-cover -count 1
 
 CLI=docker
 ORG=clanktron
-CONTAINERNAME=$(ORG)/$(BINARY_NAME)
+CONTAINERNAME=$(ORG)/$(BINARY)
 CONTAINERTAG=dev
 
-PLATFORMS=linux/arm64,linux/amd64,linux/arm/v7,linux/riscv64
-
-$(BINARY_NAME):
-	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOENV) go build $(BUILD_FLAGS) -o $(BINARY_NAME) $(SRC) ## Build binary (default)
+$(BINARY):
+	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOENV) go build $(BUILD_FLAGS) -o $(BINARY) $(SRC) ## Build binary (default)
 
 .PHONY: check
 check: test lint ## Test and lint
@@ -39,7 +37,7 @@ checksums: ## Generate release asset checksums
 
 .PHONY: clean
 clean: ## Clean workspace
-	rm -rf $(BINARY_NAME) $(ARTIFACT_DIR)/*
+	rm -rf $(BINARY) $(ARTIFACT_DIR)/*
 	go clean
 
 .PHONY: help
