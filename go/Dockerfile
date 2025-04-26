@@ -4,22 +4,16 @@ WORKDIR /build
 COPY go.mod /build/
 RUN go mod download
 
-FROM builder-base AS darwin-builder
-COPY . /build
-ARG DARWIN_ARCH
-RUN make GOOS=darwin GOARCH=${DARWIN_ARCH}
-
-FROM scratch AS darwin-bin
-ARG DARWIN_ARCH
-COPY --from=darwin-builder /build/scratchpad /scratchpad-darwin-${DARWIN_ARCH}
-
 FROM builder-base AS builder
 COPY . /build
-RUN make
+ARG BINOS
+ARG BINARCH
+RUN make GOOS=${BINOS} GOARCH=${BINARCH}
 
 FROM scratch AS bin
-ARG TARGETARCH
-COPY --from=builder /build/scratchpad /scratchpad-linux-${TARGETARCH}
+ARG BINOS
+ARG BINARCH
+COPY --from=builder /build/scratchpad /scratchpad-${BINOS}-${BINARCH}
 
 FROM scratch AS production
 COPY <<EOF /etc/passwd
