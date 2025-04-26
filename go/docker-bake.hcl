@@ -2,7 +2,7 @@ variable "cache_settings" {
   default = [
     {
       type = "registry",
-      ref = "clanktron/scratchpad-cache:cache"
+      ref = "${image}-cache:cache"
     }
   ]
 }
@@ -10,12 +10,13 @@ variable "cache_settings" {
 variable "org" { default = "clanktron" }
 variable "repo" { default = "scratchpad" }
 variable "tag" { default = "dev" }
-variable "ref" { default = "${org}/${repo}:${tag}"}
+variable "image" { default = "${org}/${scratchpad}"}
+variable "ref" { default = "${image}:${tag}"}
 
 target "default" {
   inherits = ["cache"]
   output = [
-    "type=image,name=${ref}"
+    "type=image,name=${ref},mode=max"
   ]
 }
 
