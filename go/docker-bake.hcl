@@ -10,7 +10,7 @@ variable "cache_settings" {
 variable "org" { default = "clanktron" }
 variable "repo" { default = "scratchpad" }
 variable "tag" { default = "dev" }
-variable "image" { default = "${org}/${scratchpad}"}
+variable "image" { default = "${org}/${repo}"}
 variable "ref" { default = "${image}:${tag}"}
 
 target "default" {
